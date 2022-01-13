@@ -11,12 +11,6 @@ If not go to your terminal and write:
 
 
 Now we are going to Install the oracle 18c XE Database:
-
-0. IF YOU DONT HAVE INSTALLED YUM first go to the terminal and type this commmand:
-  ***
-  brew install yum
-  ***
-  After its completed you will have installed yum.
   
 1. Open your terminal and first we are going to install the git so run this commmand:
   ***
