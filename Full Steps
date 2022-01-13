@@ -1,0 +1,138 @@
+#INSTALLING DOCKER 
+
+For installing Docker you can go to the official website
+https://docs.docker.com/desktop/mac/install/
+
+Once you have Docker, open it and make sure that it is running on your top right screen with the docker icon displayed. 
+If not go to your terminal and write:
+  ***
+  start docker
+  ***
+
+
+Now we are going to Install the oracle 18c XE Database:
+
+0. IF YOU DONT HAVE INSTALLED YUM first go to the terminal and type this commmand:
+  ***
+  brew install yum
+  ***
+  After its completed you will have installed yum.
+  
+1. Open your terminal and first we are going to install the git so run this commmand:
+  ***
+  git --version
+  ***
+  if you already have git it will show you the version, if not it will prompt you to install it, do it and continue.
+  
+2. Once it is completed we are going to clone the docker-images.git using the terminal:
+  ***
+  git clone https://github.com/oracle/docker-images.git
+  ***
+  
+3. Then access to this directory using the terminal: 
+  ***
+  cd docker-images/OracleDatabase/SingleInstance/dockerfiles
+  ***
+  
+  You will be inside the file dockerfiles and inside here you will have some files you can see them typing ls command in terminal but the
+  the next step is to run this command:
+  ***
+  ./buildContainerImage.sh -v 18.4.0 -x
+  ****
+  
+4. Make sure that the image is created by running this command: 
+  ***
+  docker images
+  ***
+  it will show 
+      REPOSITORY              TAG           IMAGE ID          CREATED           SIZE
+      oracle/database         18.4.0-xe     6a5a6370de97      1 minute ago       8.57GB
+  something like this.
+ 
+5. After you will run this command: 
+  ***
+  docker run --name myxedb \
+    -d \
+    -p 51521:1521 \
+    -p 55500:5500 \
+    -e ORACLE_PWD=mysecurepassword \
+    -e ORACLE_CHARACTERSET=AL32UTF8 \
+    oracle/database:18.4.0-xe
+   ***
+   
+   --name myxedb specifies the container name. If this option is not used, a random name is assigned by the Docker daemon.
+-d runs the container in detached (background) mode.
+-p 51521:1521 and -p 55500:5500 map a host to a container port.
+-e ORACLE_PWD=mysecurepassword and -e ORACLE_CHARACTERSET=AL32UTF8 set the environment variables. 
+Here, ORACLE_PWD sets the administrative password, and ORACLE_CHARACTERSET sets the database’s character set.
+
+  With this we will run the container in docker, you can check it is running by running this command:
+  ***
+  docker ps
+  ***
+    CONTAINER ID     IMAGE                       COMMAND                  CREATED           STATUS                                                            
+  7298b3d299e4     oracle/database:18.4.0-xe   "/bin/sh -c 'exec $O…"   42 minutes ago    Up 42 minutes (healthy)   
+  
+  It will show you something like above and it might start unhealthy check in you docker app in containers the one running with the name myxedb
+  you will see it has some procedures being made at the moment like creating the database etc... let them finish all and at the end it will show HEALTHY.
+  
+6. Now that it is running and healthy we will create a bash session within the container, run this command:
+  ***
+  docker exec -it --user=oracle myxedb bash
+  ***
+  then it will show something like this:
+  
+  [oracle@7298b3d299e4 /]$
+  
+  You will enter this command:
+  ***
+  . oraenv
+  ***
+  
+  it will show you this:
+  ORACLE_SID = [XE] ? XE = 
+  
+  you enter XE and it will say
+  
+  The Oracle base remains unchanged with value /opt/oracle.
+  
+  now in the 
+  [oracle@7298b3d299e4 /]$
+  
+  you will write 
+  ***
+  sqlplus sys@XEPDB1 as sysdba
+  ***
+  
+  it will show this: 
+  
+      SQL*Plus: Release 18.0.0.0.0 - Production on Tue May 7 17:31:48 2019
+    Version 18.4.0.0.0
+
+    Copyright (c) 1982, 2018, Oracle.  All rights reserved.
+
+    Enter password:
+
+    you will enter the password that we chosed earlier that is: mysecurepassword
+    
+     Connected to:
+    Oracle Database 18c Express Edition Release 18.0.0.0.0 - Production
+    Version 18.4.0.0.0
+   
+ 7. Now you are connected to Oracle Database 18c Express Edition Version 18.4.0.0
+  Inside here now you can access other user such as HR but you will have to unlock it, if you want run this command after you connect:
+    ***
+    ALTER USER HR ACCOUNT UNLOCK IDENTIFIED BY password;
+      then:
+    Conn hr/password@xepdb1;
+    ***
+    
+    with this you will be able to see the tables such as employees, locations, etc...
+    
+    try it with:
+    ***
+    desc employees;
+    ***
+    
+!! Good Luck !!
+
